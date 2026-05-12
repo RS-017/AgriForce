@@ -143,19 +143,28 @@
   <script src="assets/js/app.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const MOCK_USER_ID = "F123";
-      setAuthToken("demo-token"); // bypass auth for UI demo
-      
-      initNotificationSocket(MOCK_USER_ID);
-      
+      // Guard: redirect to login if no valid token exists
+      if (!requireAuth()) return;
+
+      const authUser = getAuthUser();
+      const FARMER_USER_ID = authUser ? authUser.sub : null;
+
+      // Show user role context in header
+      const welcomeEl = document.querySelector('header h2');
+      if (welcomeEl && authUser) {
+        welcomeEl.textContent = 'Welcome, Farmer';
+      }
+
+      initNotificationSocket(FARMER_USER_ID);
+
       // Load UI components
       showSkeletonLoader('forecast-panel');
       setTimeout(() => {
         hideSkeletonLoader('forecast-panel');
         renderDemandForecastChart();
       }, 800);
-      
-      loadRecommendedWorkers(MOCK_USER_ID);
+
+      loadRecommendedWorkers(FARMER_USER_ID);
       // Create alert banner container above grid dynamically
       const alertPanel = document.createElement('div');
       alertPanel.id = 'subsidy-alerts-panel';

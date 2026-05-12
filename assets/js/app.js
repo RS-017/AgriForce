@@ -58,15 +58,7 @@ function toggleAuthTab(tab) {
   if (pane) pane.classList.add('active');
 }
 
-// ── JWT decode helper (no library needed — just base64) ──────────────────────
-function decodeJwtPayload(token) {
-  try {
-    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64));
-  } catch {
-    return {};
-  }
-}
+// NOTE: decodeJwtPayload is now provided by getAuthUser() in config.js
 
 async function validateLoginForm(formData) {
   const submitBtn = document.getElementById('login-submit-btn');
@@ -82,9 +74,9 @@ async function validateLoginForm(formData) {
     setAuthToken(token);
 
     // Decode role from JWT payload (never trust a UI-visible field alone)
-    const payload = decodeJwtPayload(token);
-    const role = payload.role || res.role;
-    sessionStorage.setItem('agriforce_role', role);
+    const user = getAuthUser();
+    const role = (user && user.role) || res.role;
+    sessionStorage.setItem(ROLE_KEY, role);
 
     showToast('Login successful! Redirecting…', 'success');
     setTimeout(() => redirectByRole(role), 800);
@@ -116,9 +108,9 @@ async function validateRegistrationForm(formData) {
     const token = res.access_token || res.token;
     if (token) {
       setAuthToken(token);
-      const payload = decodeJwtPayload(token);
-      const role = payload.role || res.role;
-      sessionStorage.setItem('agriforce_role', role);
+      const user = getAuthUser();
+      const role = (user && user.role) || res.role;
+      sessionStorage.setItem(ROLE_KEY, role);
       showToast('Registration successful! Taking you to your dashboard…', 'success');
       setTimeout(() => redirectByRole(role), 1200);
     } else {

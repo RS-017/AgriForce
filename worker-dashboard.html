@@ -137,29 +137,27 @@
   <script src="assets/js/socket.js"></script>
   <script src="assets/js/app.js"></script>
   <script>
-    const CURRENT_WORKER_ID = "W456";
-
-    function scrollToSection(id) {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
+    // Guard: redirect to login if no valid token exists
     document.addEventListener("DOMContentLoaded", () => {
-      // Restore token from sessionStorage if page was refreshed
-      // (In production use httpOnly cookie; this is dev-mode only)
-      setAuthToken("demo-token");
+      if (!requireAuth()) return;
+
+      const authUser = getAuthUser();
+      const CURRENT_WORKER_ID = authUser ? authUser.sub : null;
+
+      function scrollToSection(id) {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
 
       // Show dynamic name from JWT if available
-      const role = sessionStorage.getItem('agriforce_role');
       const welcomeEl = document.querySelector('header h2');
-      if (welcomeEl) {
-        // In production decode name from JWT; for now show role context
-        welcomeEl.textContent = role === 'WORKER' ? 'Welcome back, Worker' : 'Welcome, Suresh';
+      if (welcomeEl && authUser) {
+        welcomeEl.textContent = 'Welcome back, Worker';
       }
 
       initJobAlertSocket(CURRENT_WORKER_ID);
       calculateProfileCompletion(CURRENT_WORKER_ID);
-      
+
       fetchAvailableJobs(); // Fetch initial jobs
       loadMyApplications(CURRENT_WORKER_ID);
       renderEarningsChart(CURRENT_WORKER_ID, '3m');

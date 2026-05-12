@@ -3,10 +3,56 @@ const APP_NAME = "AgriForce";
 const API_BASE = "http://localhost:8000/api/v1";
 const WS_BASE  = "ws://localhost:8000/ws";
 
-let AUTH_TOKEN = null; // in-memory only — never localStorage/sessionStorage
+// ── Token persistence — sessionStorage survives page navigations but clears on tab close ──
+const TOKEN_KEY = 'agriforce_token';
+const ROLE_KEY  = 'agriforce_role';
 
-function getAuthToken() { return AUTH_TOKEN; }
-function setAuthToken(token) { AUTH_TOKEN = token; }
+function getAuthToken() {
+  return sessionStorage.getItem(TOKEN_KEY);
+}
+
+function setAuthToken(token) {
+  if (token) {
+    sessionStorage.setItem(TOKEN_KEY, token);
+  } else {
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(ROLE_KEY);
+  }
+}
+
+/** Returns decoded JWT payload fields (role, sub, exp) — no library needed. */
+function getAuthUser() {
+  const token = getAuthToken();
+  if (!token) return null;
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Call at the top of any protected page.
+ * If there is no valid token, instantly redirects to login.html.
+ */
+function requireAuth() {
+  const token = getAuthToken();
+  if (!token) {
+    window.location.replace('login.html');
+    return false;
+  }
+  // Check expiry
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (payload.exp && Date.now() / 1000 > payload.exp) {
+      setAuthToken(null); // clear expired token
+      window.location.replace('login.html');
+      return false;
+    }
+  } catch { /* ignore decode errors — server will reject the token */ }
+  return true;
+}
 
 // Helper: authenticated fetch wrapper
 async function apiFetch(endpoint, options = {}) {
