@@ -147,3 +147,11 @@ async def logoutUser(
         token = auth_header.split(" ", 1)[1]
         blacklist_token(token)
     return {"message": "logged out"}
+
+
+@router.get("/me", response_model=UserResponse)
+async def getCurrentUser(
+    current_user: User = Depends(get_current_user),
+):
+    """Return the currently authenticated user's profile."""
+    return current_user
