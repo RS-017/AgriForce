@@ -114,14 +114,14 @@ async def validateLoginForm(body: UserLogin, db: AsyncSession = Depends(get_db))
 @router.post("/request-otp")
 @limiter.limit("3/10minutes")
 async def requestOTP(body: OTPRequest, request: Request):
-    """Trigger Twilio Verify OTP (rate-limited)."""
+    """Generate and send a 6-digit OTP (rate-limited to 3 per 10 min)."""
     result = await otp_service.requestOTP(body.phone)
     return {"status": result.get("status", "pending")}
 
 
 @router.post("/verify-otp")
 async def verifyOTP(body: OTPVerify, db: AsyncSession = Depends(get_db)):
-    """Verify Twilio OTP and mark user as verified."""
+    """Verify OTP code and mark user as verified."""
     approved = await otp_service.verifyOTP(body.phone, body.otp)
     if not approved:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
