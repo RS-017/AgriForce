@@ -1,4 +1,9 @@
-"""core/otp.py — In-memory OTP service (no external provider)."""
+"""core/otp.py — In-memory OTP service (no external SMS provider).
+
+In development mode the generated OTP is:
+  1. Returned directly in the /request-otp API response  ← easiest to use
+  2. Printed to the server console as a fallback
+"""
 from __future__ import annotations
 
 import random
@@ -15,15 +20,16 @@ def _generate_otp() -> str:
 
 
 async def requestOTP(phone: str) -> dict:
-    """Generate a 6-digit OTP and store it in memory."""
+    """Generate a 6-digit OTP, store it, and return it in the response."""
     code = _generate_otp()
     expires_at = time.time() + OTP_TTL_SECONDS
     _otp_store[phone] = (code, expires_at)
 
-    # In development: print to console so you can use it
-    print(f"\n[OTP] Phone: {phone}  Code: {code}  (valid 5 min)\n")
+    # Console fallback — visible in the uvicorn terminal
+    print(f"\n[DEV OTP] Phone: {phone}  Code: {code}  (valid 5 min)\n")
 
-    return {"status": "pending"}
+    # Return the code directly so the frontend / Swagger UI can use it
+    return {"status": "pending", "dev_otp": code}
 
 
 async def verifyOTP(phone: str, code: str) -> bool:
@@ -40,6 +46,6 @@ async def verifyOTP(phone: str, code: str) -> bool:
     if stored_code != code.strip():
         return False
 
-    # Consume the OTP so it cannot be reused
+    # Consume the OTP — cannot be reused
     del _otp_store[phone]
     return True

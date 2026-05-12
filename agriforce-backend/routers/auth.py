@@ -114,9 +114,10 @@ async def validateLoginForm(body: UserLogin, db: AsyncSession = Depends(get_db))
 @router.post("/request-otp")
 @limiter.limit("3/10minutes")
 async def requestOTP(body: OTPRequest, request: Request):
-    """Generate and send a 6-digit OTP (rate-limited to 3 per 10 min)."""
+    """Generate a 6-digit OTP. In development the code is returned as 'dev_otp'."""
     result = await otp_service.requestOTP(body.phone)
-    return {"status": result.get("status", "pending")}
+    # dev_otp is present so callers can see the code without a real SMS provider
+    return {"status": result.get("status", "pending"), "dev_otp": result.get("dev_otp")}
 
 
 @router.post("/verify-otp")

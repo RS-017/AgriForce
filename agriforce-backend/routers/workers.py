@@ -4,12 +4,12 @@ from __future__ import annotations
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from core.auth import get_current_user
-from core.permissions import require_worker
+from core.permissions import require_worker, require_farmer
 from database import get_db
 from models.jobs import Application, ApplicationStatus, JobPost
 from models.users import User
@@ -25,7 +25,6 @@ async def loadRecommendedWorkers(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_farmer),
 ):
-    from core.permissions import require_farmer  # noqa
     return await worker_service.loadRecommendedWorkers(db, farmerId)
 
 
@@ -41,7 +40,7 @@ async def calculateProfileCompletion(
 @router.get("/{workerId}/earnings", response_model=EarningsOut)
 async def renderEarningsChart(
     workerId: UUID,
-    period: str = Query("3m", regex="^(3m|6m|1y)$"),
+    period: str = Query("3m", pattern="^(3m|6m|1y)$"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_worker),
 ):
@@ -71,7 +70,3 @@ async def renderEarningsChart(
     earnings = [monthly[l] for l in labels]
 
     return EarningsOut(labels=labels, earnings=earnings)
-
-
-# Lazy import to avoid circular; require_farmer is used in recommended workers
-from core.permissions import require_farmer  # noqa: E402

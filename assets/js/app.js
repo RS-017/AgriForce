@@ -96,13 +96,25 @@ async function validateRegistrationForm(formData) {
 }
 
 async function requestOTP(phone) {
+  if (!phone || phone.trim().length < 6) {
+    showToast("Please enter a valid phone number first", "warning");
+    return;
+  }
   try {
-    await apiFetch('/auth/request-otp', {
+    const res = await apiFetch('/auth/request-otp', {
       method: 'POST',
       body: JSON.stringify({ phone })
     });
-    showToast("OTP sent successfully", "success");
     document.getElementById('otp-section').style.display = 'block';
+
+    // Development mode: backend returns the OTP in the response
+    if (res && res.dev_otp) {
+      const otpInput = document.getElementById('reg-otp');
+      if (otpInput) otpInput.value = res.dev_otp;
+      showToast(`[DEV] Your OTP is: ${res.dev_otp}`, "info");
+    } else {
+      showToast("OTP sent successfully", "success");
+    }
   } catch (error) {
     showToast(error.message, "error");
   }
