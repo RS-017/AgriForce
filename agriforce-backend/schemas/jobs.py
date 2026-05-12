@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 from uuid import UUID
 
@@ -29,7 +29,7 @@ class JobPostOut(BaseModel):
     end_date: date
     daily_wage_offered: float
     status: str
-    created_at: Optional[str]
+    created_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 

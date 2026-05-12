@@ -26,6 +26,9 @@ class UserCreate(BaseModel):
     equipmentTypes: Optional[str] = None
     providerDistrict: Optional[str] = None
 
+    # Silently ignore extra form fields like 'confirmPassword'
+    model_config = {"extra": "ignore"}
+
 
 class UserLogin(BaseModel):
     phone: str  # phone OR email (frontend sends as 'phone')
@@ -37,6 +40,7 @@ class TokenResponse(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
     role: str
+    token: Optional[str] = None  # alias for access_token (frontend compat)
 
 
 class UserResponse(BaseModel):

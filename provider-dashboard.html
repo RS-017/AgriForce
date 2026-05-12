@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Provider Dashboard - AgriForce</title>
+  <meta name="description" content="Manage your equipment listings, booking requests, and rental earnings on AgriForce.">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar flex-col justify-between">
+    <div>
+      <div class="px-4 mb-6">
+        <h2 class="text-primary flex items-center gap-2"><i data-lucide="leaf"></i> AgriForce</h2>
+        <p class="text-muted text-sm mt-1">Equipment Provider</p>
+      </div>
+      <nav>
+        <a href="provider-dashboard.html" class="sidebar-link active"><i data-lucide="home"></i> Dashboard</a>
+        <a href="#equipment-section" class="sidebar-link" onclick="scrollToSection('equipment-section')"><i data-lucide="truck"></i> My Equipment</a>
+        <a href="#bookings-section" class="sidebar-link" onclick="scrollToSection('bookings-section')"><i data-lucide="calendar"></i> Bookings</a>
+        <a href="#earnings-section" class="sidebar-link" onclick="scrollToSection('earnings-section')"><i data-lucide="indian-rupee"></i> Earnings</a>
+      </nav>
+    </div>
+    <div class="px-4 pb-4">
+      <button class="btn btn-outline w-100" onclick="logoutUser()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <!-- Top Navbar -->
+    <header class="flex justify-between items-center mb-6">
+      <h2 id="welcome-heading">Welcome, Provider</h2>
+      <div class="flex gap-4 items-center">
+        <button class="theme-toggle" onclick="toggleDarkMode()"><i data-lucide="moon" id="theme-icon"></i></button>
+        <div style="position: relative;">
+          <button class="notif-bell"><i data-lucide="bell"></i><span class="notif-badge" style="display: none;">0</span></button>
+          <div id="notif-panel" style="display: none; position: absolute; right: 0; width: 300px; background: var(--color-surface); box-shadow: var(--shadow-lg); border-radius: var(--radius-md); padding: var(--space-2); z-index: 100;"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- KPI Row -->
+    <div class="stats-row">
+      <div class="card stat-card">
+        <div class="stat-value" id="kpi-listings">—</div>
+        <div class="stat-label">Listed Equipment</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value" id="kpi-active">—</div>
+        <div class="stat-label">Active Rentals</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value" id="kpi-pending">—</div>
+        <div class="stat-label">Pending Requests</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value text-primary" id="kpi-revenue">—</div>
+        <div class="stat-label">This Month (₹)</div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6);">
+
+      <!-- Left: Equipment Catalogue -->
+      <div>
+        <div class="card mb-6" id="equipment-section">
+          <div class="flex justify-between items-center mb-4">
+            <h3>My Equipment</h3>
+            <button class="btn btn-primary btn-sm" onclick="openAddEquipmentModal()">
+              <i data-lucide="plus"></i> Add Equipment
+            </button>
+          </div>
+          <div id="equipment-list">
+            <!-- Skeleton shown while loading -->
+          </div>
+        </div>
+
+        <!-- Booking Requests -->
+        <div class="card" id="bookings-section">
+          <div class="flex justify-between items-center mb-4">
+            <h3>Booking Requests</h3>
+            <span class="badge badge-amber" id="pending-count-badge">0 pending</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table" id="bookings-table">
+              <thead>
+                <tr>
+                  <th>Equipment</th>
+                  <th>Farmer</th>
+                  <th>Dates</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-tbody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Earnings Chart + Availability -->
+      <div>
+        <div class="card mb-6" id="earnings-section">
+          <div class="flex justify-between items-center mb-4">
+            <h3>Rental Earnings</h3>
+            <select class="form-control btn-sm" style="width: 100px; height: 32px;" onchange="renderProviderEarningsChart(this.value)">
+              <option value="3m">3 Months</option>
+              <option value="6m">6 Months</option>
+              <option value="1y">1 Year</option>
+            </select>
+          </div>
+          <div style="height: 220px; position: relative;">
+            <canvas id="providerEarningsChart"></canvas>
+          </div>
+          <div class="mt-4 flex justify-between items-center" style="border-top: 1px solid var(--color-border); padding-top: var(--space-4);">
+            <div>
+              <p class="text-muted text-sm">Total This Month</p>
+              <p class="font-bold text-primary" id="total-earnings-display">—</p>
+            </div>
+            <div>
+              <p class="text-muted text-sm">Utilisation Rate</p>
+              <p class="font-bold" id="utilisation-rate">—</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Availability Toggle -->
+        <div class="card">
+          <h3 class="mb-4">Quick Availability</h3>
+          <div id="availability-toggles">
+            <div class="flex justify-between items-center mb-3 p-3" style="border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
+              <div>
+                <p class="font-medium">Mahindra Tractor</p>
+                <p class="text-muted text-sm">₹1,500/day</p>
+              </div>
+              <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                <input type="checkbox" checked onchange="toggleEquipmentAvailability('EQ1', this.checked)" style="opacity: 0; width: 0; height: 0;">
+                <span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#52b788;border-radius:34px;transition:.3s;"></span>
+              </label>
+            </div>
+            <div class="flex justify-between items-center mb-3 p-3" style="border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
+              <div>
+                <p class="font-medium">Rotavator</p>
+                <p class="text-muted text-sm">₹800/day</p>
+              </div>
+              <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                <input type="checkbox" onchange="toggleEquipmentAvailability('EQ2', this.checked)" style="opacity: 0; width: 0; height: 0;">
+                <span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:34px;transition:.3s;"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Add Equipment Modal -->
+  <div id="add-equipment-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div class="card" style="max-width: 480px; width: 100%; margin: var(--space-4);">
+      <div class="flex justify-between items-center mb-6">
+        <h3>Add New Equipment</h3>
+        <button onclick="closeAddEquipmentModal()" style="background:none;border:none;cursor:pointer;font-size:1.5rem;">&times;</button>
+      </div>
+      <form id="add-equipment-form" onsubmit="event.preventDefault(); submitNewEquipment(new FormData(this));">
+        <div class="form-group">
+          <label class="form-label">Equipment Name</label>
+          <input type="text" name="name" class="form-control" placeholder="e.g., Mahindra 265 Tractor" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select name="type" class="form-control" required>
+            <option value="">Select type</option>
+            <option value="Tractor">Tractor</option>
+            <option value="Harvester">Harvester</option>
+            <option value="Rotavator">Rotavator</option>
+            <option value="Plough">Plough</option>
+            <option value="Sprayer">Sprayer</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Daily Rate (₹)</label>
+            <input type="number" name="dailyRate" class="form-control" placeholder="1500" required min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">District</label>
+            <input type="text" name="district" class="form-control" placeholder="Your district">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-control" rows="2" placeholder="Condition, horsepower, age, etc."></textarea>
+        </div>
+        <button type="submit" id="add-equipment-submit-btn" class="btn btn-primary w-100">List Equipment</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/socket.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    const PROVIDER_ID = "P789";
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function openAddEquipmentModal() {
+      document.getElementById('add-equipment-modal').style.display = 'flex';
+    }
+
+    function closeAddEquipmentModal() {
+      document.getElementById('add-equipment-modal').style.display = 'none';
+      document.getElementById('add-equipment-form').reset();
+    }
+
+    async function submitNewEquipment(formData) {
+      const btn = document.getElementById('add-equipment-submit-btn');
+      btn.disabled = true; btn.textContent = 'Listing…';
+      try {
+        const data = Object.fromEntries(formData.entries());
+        await apiFetch('/equipment/list', { method: 'POST', body: JSON.stringify(data) });
+        showToast('Equipment listed successfully!', 'success');
+        closeAddEquipmentModal();
+        loadProviderEquipment();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'List Equipment';
+      }
+    }
+
+    async function toggleEquipmentAvailability(equipId, available) {
+      try {
+        await apiFetch(`/equipment/${equipId}/availability`, {
+          method: 'PATCH',
+          body: JSON.stringify({ available })
+        });
+        showToast(available ? 'Marked as available' : 'Marked as unavailable', 'info');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function acceptBooking(bookingId) {
+      try {
+        await apiFetch(`/equipment/bookings/${bookingId}/accept`, { method: 'PATCH' });
+        showToast('Booking accepted', 'success');
+        loadBookingRequests();
+      } catch (err) { showToast(err.message, 'error'); }
+    }
+
+    async function rejectBooking(bookingId) {
+      if (!confirm('Reject this booking request?')) return;
+      try {
+        await apiFetch(`/equipment/bookings/${bookingId}/reject`, { method: 'PATCH' });
+        showToast('Booking rejected', 'warning');
+        loadBookingRequests();
+      } catch (err) { showToast(err.message, 'error'); }
+    }
+
+    async function loadProviderEquipment() {
+      showSkeletonLoader('equipment-list');
+      const items = [
+        { id: 'EQ1', name: 'Mahindra 265 Tractor', type: 'Tractor', dailyRate: 1500, available: true, district: 'Ludhiana' },
+        { id: 'EQ2', name: 'Rotavator (6ft)', type: 'Rotavator', dailyRate: 800, available: false, district: 'Ludhiana' },
+      ];
+      await new Promise(r => setTimeout(r, 600));
+      hideSkeletonLoader('equipment-list');
+      const list = document.getElementById('equipment-list');
+      if (!list) return;
+      list.innerHTML = items.map(eq => `
+        <div class="flex justify-between items-center p-3 mb-2" style="border:1px solid var(--color-border); border-radius:var(--radius-sm);">
+          <div>
+            <p class="font-medium">${eq.name}</p>
+            <p class="text-muted text-sm"><i data-lucide="map-pin" style="width:12px;display:inline-block;vertical-align:text-bottom;"></i> ${eq.district} &nbsp;·&nbsp; ₹${eq.dailyRate}/day</p>
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="badge ${eq.available ? 'badge-green' : 'badge-red'}">${eq.available ? 'AVAILABLE' : 'BOOKED'}</span>
+            <button class="btn btn-outline btn-sm" onclick="showToast('Edit coming soon', 'info')"><i data-lucide="edit-2"></i></button>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('kpi-listings').textContent = items.length;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    async function loadBookingRequests() {
+      // Mock data — replace with: await apiFetch(`/equipment/bookings?providerId=${PROVIDER_ID}`)
+      const bookings = [
+        { id: 'B1', equipment: 'Mahindra 265', farmer: 'Ramesh Kumar', dates: 'Oct 15–17', amount: '₹4,500', status: 'PENDING' },
+        { id: 'B2', equipment: 'Rotavator', farmer: 'Priya Singh', dates: 'Oct 20–21', amount: '₹1,600', status: 'PENDING' },
+      ];
+      const tbody = document.getElementById('bookings-tbody');
+      if (!tbody) return;
+      const pending = bookings.filter(b => b.status === 'PENDING');
+      document.getElementById('pending-count-badge').textContent = `${pending.length} pending`;
+      document.getElementById('kpi-pending').textContent = pending.length;
+      tbody.innerHTML = bookings.map(b => `
+        <tr>
+          <td>${b.equipment}</td>
+          <td>${b.farmer}</td>
+          <td>${b.dates}</td>
+          <td class="font-bold">${b.amount}</td>
+          <td>
+            <button class="btn btn-primary btn-sm mr-1" onclick="acceptBooking('${b.id}')">Accept</button>
+            <button class="btn btn-outline btn-sm" onclick="rejectBooking('${b.id}')">Reject</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderProviderEarningsChart(period = '3m') {
+      const ctx = document.getElementById('providerEarningsChart');
+      if (!ctx) return;
+      if (window.providerChart) window.providerChart.destroy();
+
+      const datasets = {
+        '3m': { labels: ['Aug', 'Sep', 'Oct'], data: [8200, 11500, 6800] },
+        '6m': { labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'], data: [4200, 7100, 9800, 8200, 11500, 6800] },
+        '1y': { labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'], data: [3000, 2500, 5800, 6200, 9100, 7400, 4200, 7100, 9800, 8200, 11500, 6800] },
+      };
+      const d = datasets[period] || datasets['3m'];
+      const total = d.data.reduce((a, b) => a + b, 0);
+      document.getElementById('total-earnings-display').textContent = `₹${total.toLocaleString('en-IN')}`;
+      document.getElementById('utilisation-rate').textContent = '74%';
+      document.getElementById('kpi-revenue').textContent = `₹${d.data[d.data.length - 1].toLocaleString('en-IN')}`;
+      document.getElementById('kpi-active').textContent = '1';
+
+      window.providerChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: d.labels,
+          datasets: [{
+            label: 'Rental Earnings (₹)',
+            data: d.data,
+            backgroundColor: 'rgba(45, 106, 79, 0.8)',
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setAuthToken('demo-token');
+
+      const welcomeEl = document.getElementById('welcome-heading');
+      if (welcomeEl && welcomeEl.textContent === 'Welcome, Provider') {
+        welcomeEl.textContent = 'Welcome, Equipment Provider';
+      }
+
+      loadProviderEquipment();
+      loadBookingRequests();
+      renderProviderEarningsChart('3m');
+    });
+  </script>
+</body>
+</html>

@@ -25,7 +25,8 @@ router = APIRouter(prefix="/api/v1/subsidies", tags=["Subsidies"])
 @router.get("/alerts", response_model=list[SubsidyAlertOut])
 async def loadSubsidyAlerts(
     region: str = Query(""),
-    crop_type: str = Query(""),
+    crop: str = Query(""),          # used by app.js
+    crop_type: str = Query(""),     # kept for Swagger compat
     db: AsyncSession = Depends(get_db),
 ):
     """Return schemes with deadline within the next 30 days."""
@@ -45,7 +46,8 @@ async def loadSubsidyAlerts(
 @router.get("/", response_model=list[SubsidySchemeOut])
 async def fetchSubsidySchemes(
     region: Optional[str] = Query(None),
-    crop_type: Optional[str] = Query(None),
+    crop: Optional[str] = Query(None),       # used by app.js
+    crop_type: Optional[str] = Query(None),  # kept for Swagger compat
     db: AsyncSession = Depends(get_db),
 ):
     query = select(SubsidyScheme).options(selectinload(SubsidyScheme.crops))

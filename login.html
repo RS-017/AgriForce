@@ -46,7 +46,45 @@
       <div style="max-width: 400px; margin: 0 auto;">
         <h1 style="color: white; font-size: 3rem; margin-bottom: var(--space-4);">AgriForce</h1>
         <p style="font-size: 1.25rem; opacity: 0.9;">Predict. Connect. Harvest on Time.</p>
-        <img src="https://placehold.co/400x300/2d6a4f/ffffff?text=AgriForce+Illustration" alt="Farmer illustration" loading="lazy" class="mt-8" style="border-radius: var(--radius-md);">
+        <svg viewBox="0 0 420 280" xmlns="http://www.w3.org/2000/svg" class="mt-8" style="border-radius: var(--radius-md); width: 100%; max-width: 420px; opacity: 0.92;" aria-label="AgriForce farm illustration">
+          <!-- Sky -->
+          <rect width="420" height="280" fill="#1b4332" rx="12"/>
+          <!-- Sun -->
+          <circle cx="370" cy="50" r="30" fill="#f4a261" opacity="0.9"/>
+          <!-- Fields -->
+          <ellipse cx="210" cy="230" rx="200" ry="80" fill="#2d6a4f"/>
+          <ellipse cx="210" cy="240" rx="200" ry="70" fill="#40916c"/>
+          <!-- Crop rows -->
+          <g stroke="#52b788" stroke-width="2" opacity="0.6">
+            <line x1="60" y1="220" x2="60" y2="195"/>
+            <line x1="90" y1="225" x2="90" y2="198"/>
+            <line x1="120" y1="222" x2="120" y2="196"/>
+            <line x1="150" y1="218" x2="150" y2="194"/>
+            <line x1="180" y1="215" x2="180" y2="192"/>
+            <line x1="210" y1="214" x2="210" y2="190"/>
+            <line x1="240" y1="215" x2="240" y2="192"/>
+            <line x1="270" y1="218" x2="270" y2="194"/>
+            <line x1="300" y1="222" x2="300" y2="196"/>
+            <line x1="330" y1="225" x2="330" y2="198"/>
+            <line x1="360" y1="220" x2="360" y2="195"/>
+          </g>
+          <!-- Barn -->
+          <rect x="30" y="130" width="80" height="60" fill="#d62828" rx="2"/>
+          <polygon points="30,130 70,100 110,130" fill="#a4161a"/>
+          <rect x="55" y="155" width="30" height="35" fill="#6b2737"/>
+          <!-- Tractor -->
+          <rect x="260" y="170" width="70" height="35" fill="#e9c46a" rx="4"/>
+          <circle cx="280" cy="205" r="12" fill="#264653"/>
+          <circle cx="315" cy="205" r="10" fill="#264653"/>
+          <rect x="285" y="160" width="35" height="20" fill="#f4a261" rx="2"/>
+          <!-- Worker silhouette -->
+          <circle cx="195" cy="145" r="12" fill="#f4a261"/>
+          <rect x="185" y="157" width="20" height="30" fill="#264653" rx="3"/>
+          <line x1="185" y1="165" x2="170" y2="180" stroke="#264653" stroke-width="3" stroke-linecap="round"/>
+          <line x1="205" y1="165" x2="215" y2="178" stroke="#264653" stroke-width="3" stroke-linecap="round"/>
+          <!-- Label -->
+          <text x="210" y="270" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11" font-family="sans-serif">AgriForce — Connecting Farms &amp; Workers</text>
+        </svg>
       </div>
     </div>
     
@@ -71,7 +109,7 @@
             <a href="#" class="text-primary font-medium">Forgot Password?</a>
           </div>
           
-          <button type="submit" class="btn btn-primary w-100 mb-4">Login</button>
+          <button type="submit" id="login-submit-btn" class="btn btn-primary w-100 mb-4">Login</button>
           
           <p class="text-center text-muted">
             Don't have an account? <a href="register.html" class="font-bold">Register</a>

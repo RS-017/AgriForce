@@ -58,21 +58,45 @@ function toggleAuthTab(tab) {
   if (pane) pane.classList.add('active');
 }
 
+// ── JWT decode helper (no library needed — just base64) ──────────────────────
+function decodeJwtPayload(token) {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+  } catch {
+    return {};
+  }
+}
+
 async function validateLoginForm(formData) {
+  const submitBtn = document.getElementById('login-submit-btn');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Logging in…'; }
   try {
     const data = Object.fromEntries(formData.entries());
     const res = await apiFetch('/auth/login', {
       method: 'POST',
       body: JSON.stringify(data)
     });
-    setAuthToken(res.token);
-    redirectByRole(res.role);
+    const token = res.access_token || res.token;
+    if (!token) throw new Error('No token received from server');
+    setAuthToken(token);
+
+    // Decode role from JWT payload (never trust a UI-visible field alone)
+    const payload = decodeJwtPayload(token);
+    const role = payload.role || res.role;
+    sessionStorage.setItem('agriforce_role', role);
+
+    showToast('Login successful! Redirecting…', 'success');
+    setTimeout(() => redirectByRole(role), 800);
   } catch (error) {
-    showToast(error.message, "error");
+    showToast(error.message, 'error');
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Login'; }
   }
 }
 
 async function validateRegistrationForm(formData) {
+  const submitBtn = document.getElementById('submit-btn');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Creating account…'; }
   try {
     const data = Object.fromEntries(formData.entries());
     
@@ -88,10 +112,22 @@ async function validateRegistrationForm(formData) {
       method: 'POST',
       body: JSON.stringify(data)
     });
-    showToast("Registration successful! Please login.", "success");
-    setTimeout(() => { window.location.href = "login.html"; }, 1500);
+    // Directly log in after registration
+    const token = res.access_token || res.token;
+    if (token) {
+      setAuthToken(token);
+      const payload = decodeJwtPayload(token);
+      const role = payload.role || res.role;
+      sessionStorage.setItem('agriforce_role', role);
+      showToast('Registration successful! Taking you to your dashboard…', 'success');
+      setTimeout(() => redirectByRole(role), 1200);
+    } else {
+      showToast('Registration successful! Please login.', 'success');
+      setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+    }
   } catch (error) {
-    showToast(error.message, "error");
+    showToast(error.message, 'error');
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Create Account'; }
   }
 }
 
@@ -141,7 +177,8 @@ async function logoutUser() {
     console.error(e);
   } finally {
     setAuthToken(null);
-    window.location.href = "login.html";
+    sessionStorage.removeItem('agriforce_role');
+    window.location.href = 'login.html';
   }
 }
 

@@ -19,9 +19,9 @@
       </div>
       <nav>
         <a href="worker-dashboard.html" class="sidebar-link active"><i data-lucide="home"></i> Dashboard</a>
-        <a href="#" class="sidebar-link"><i data-lucide="search"></i> Find Jobs</a>
-        <a href="#" class="sidebar-link"><i data-lucide="briefcase"></i> My Applications</a>
-        <a href="#" class="sidebar-link"><i data-lucide="user"></i> Profile</a>
+        <a href="#jobs-section" class="sidebar-link" onclick="scrollToSection('jobs-section')"><i data-lucide="search"></i> Find Jobs</a>
+        <a href="#applications-section" class="sidebar-link" onclick="scrollToSection('applications-section')"><i data-lucide="briefcase"></i> My Applications</a>
+        <a href="#earnings-section" class="sidebar-link" onclick="scrollToSection('earnings-section')"><i data-lucide="bar-chart-2"></i> Earnings</a>
       </nav>
     </div>
     <div class="px-4 pb-4">
@@ -58,7 +58,7 @@
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6);">
       
       <!-- Left Column: Jobs & Filter -->
-      <div>
+      <div id="jobs-section">
         <div class="card mb-6">
           <div class="flex justify-between items-center mb-4">
             <h3>Available Jobs</h3>
@@ -96,7 +96,7 @@
 
       <!-- Right Column: My Apps & Earnings -->
       <div>
-        <div class="card mb-6">
+        <div class="card mb-6" id="applications-section">
           <h3>My Applications</h3>
           <div class="table-responsive mt-4">
             <table class="table" id="my-apps-table">
@@ -115,7 +115,7 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card" id="earnings-section">
           <div class="flex justify-between items-center mb-4">
             <h3>Earnings Summary</h3>
             <select class="form-control btn-sm" style="width: 100px; height: 32px;" onchange="renderEarningsChart(CURRENT_WORKER_ID, this.value)">
@@ -138,10 +138,25 @@
   <script src="assets/js/app.js"></script>
   <script>
     const CURRENT_WORKER_ID = "W456";
-    
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
+      // Restore token from sessionStorage if page was refreshed
+      // (In production use httpOnly cookie; this is dev-mode only)
       setAuthToken("demo-token");
-      
+
+      // Show dynamic name from JWT if available
+      const role = sessionStorage.getItem('agriforce_role');
+      const welcomeEl = document.querySelector('header h2');
+      if (welcomeEl) {
+        // In production decode name from JWT; for now show role context
+        welcomeEl.textContent = role === 'WORKER' ? 'Welcome back, Worker' : 'Welcome, Suresh';
+      }
+
       initJobAlertSocket(CURRENT_WORKER_ID);
       calculateProfileCompletion(CURRENT_WORKER_ID);
       

@@ -80,7 +80,7 @@ class WorkerProfile(Base):
     availability_status = Column(Enum(AvailabilityStatus), default=AvailabilityStatus.AVAILABLE)
     is_migrant = Column(Boolean, default=False)
 
-    user = relationship("User", back_populates="worker_profile")
+    user = relationship("User", back_populates="worker_profile", foreign_keys=[user_id])
     skills = relationship("Skill", secondary="worker_skills", back_populates="workers")
     applications = relationship("Application", back_populates="worker", cascade="all, delete-orphan")
 

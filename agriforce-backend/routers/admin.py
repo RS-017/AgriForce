@@ -1,7 +1,7 @@
 """routers/admin.py — Admin-only user management and reports."""
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -88,11 +88,15 @@ async def deactivateUser(
 
 
 @router.get("/reports/export")
-async def exportReport_route(
-    report_type: str,
-    start_date: date,
-    end_date: date,
+async def export_report_route(
+    type: str = "users",
+    range: str = "30d",
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_admin),
 ):
-    return await exportReport(db, report_type, start_date, end_date)
+    """Export CSV report. range: 30d | 90d | 1y"""
+    days_map = {"30d": 30, "90d": 90, "1y": 365}
+    days = days_map.get(range, 30)
+    end_date = date.today()
+    start_date = end_date - timedelta(days=days)
+    return await exportReport(db, type, start_date, end_date)

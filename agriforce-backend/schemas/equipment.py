@@ -18,11 +18,23 @@ class EquipmentOut(BaseModel):
     type: str
     description: Optional[str]
     daily_rate: float
+    dailyRate: Optional[float] = None  # camelCase alias for frontend
     district: str
     availability_status: str
+    available: Optional[bool] = None  # derived: True when AVAILABLE
     images: list[str] = []
+    image: Optional[str] = None  # first image URL for card display
 
     model_config = {"from_attributes": True}
+
+    @classmethod
+    def model_validate(cls, obj, **kwargs):
+        instance = super().model_validate(obj, **kwargs)
+        # Derive convenience fields
+        instance.available = (instance.availability_status == "AVAILABLE")
+        instance.dailyRate = instance.daily_rate
+        instance.image = instance.images[0] if instance.images else None
+        return instance
 
 
 class RentalBookingOut(BaseModel):

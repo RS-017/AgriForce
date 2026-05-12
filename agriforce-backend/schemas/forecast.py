@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 
 class ForecastDataPoint(BaseModel):
-    date: date
+    date: str  # ISO date string e.g. "2026-06-01"
     predicted: float
     lower_80: float
     upper_80: float
