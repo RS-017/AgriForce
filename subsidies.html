@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subsidies - AgriForce</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar flex-col justify-between">
+    <div>
+      <div class="px-4 mb-6">
+        <h2 class="text-primary flex items-center gap-2"><i data-lucide="leaf"></i> AgriForce</h2>
+      </div>
+      <nav>
+        <a href="farmer-dashboard.html" class="sidebar-link"><i data-lucide="home"></i> Dashboard</a>
+        <a href="post-job.html" class="sidebar-link"><i data-lucide="plus-circle"></i> Post Job</a>
+        <a href="equipment-rental.html" class="sidebar-link"><i data-lucide="truck"></i> Equipment</a>
+        <a href="subsidies.html" class="sidebar-link active"><i data-lucide="file-text"></i> Subsidies</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="flex justify-between items-center mb-6">
+      <h2>Government Subsidies</h2>
+      <button class="theme-toggle" onclick="toggleDarkMode()"><i data-lucide="moon" id="theme-icon"></i></button>
+    </header>
+
+    <!-- Filters -->
+    <div class="card mb-6">
+      <form id="subsidy-filters" onsubmit="event.preventDefault(); fetchSubsidySchemes(this.region.value, this.crop.value);">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: var(--space-4); align-items: end;">
+          <div class="form-group mb-0">
+            <label class="form-label">Region</label>
+            <input type="text" name="region" class="form-control" placeholder="State/District">
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label">Crop Type</label>
+            <select name="crop" class="form-control">
+              <option value="">All Crops</option>
+              <option value="Wheat">Wheat</option>
+              <option value="Rice">Rice</option>
+            </select>
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label">Ministry</label>
+            <select name="ministry" class="form-control">
+              <option value="">All Ministries</option>
+              <option value="MoA">Ministry of Agriculture</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="height: 44px;">Search Schemes</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Container for results -->
+    <div id="subsidies-container">
+      <!-- Populated by JS. Example item: -->
+      <div class="card mb-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3>PM-KISAN Equipment Subsidy</h3>
+            <p class="text-muted">Ministry of Agriculture</p>
+          </div>
+          <span class="badge badge-amber">Deadline: 15 Nov 2026</span>
+        </div>
+        <p class="mt-4">Up to 50% subsidy on purchasing new tractors and harvesters for small and marginal farmers.</p>
+        <div class="mt-4 gap-2 flex">
+          <span class="badge badge-gray">All Crops</span>
+          <span class="badge badge-gray">&lt; 5 Acres</span>
+        </div>
+        <div class="mt-6 flex gap-4">
+          <button class="btn btn-outline" onclick="checkSubsidyEligibility({farmSize: 4}, 'S1')">Check My Eligibility</button>
+          <button class="btn btn-primary" onclick="redirectToSchemePortal('https://pmkisan.gov.in')">Apply Now</button>
+        </div>
+        <div id="eligibility-result-S1" class="mt-4"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - AgriForce</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .auth-tabs {
+      display: flex;
+      border-bottom: 2px solid #e0e0e0;
+      margin-bottom: var(--space-6);
+    }
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: var(--space-3);
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .auth-tab.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+    .auth-pane { display: none; }
+    .auth-pane.active { display: block; }
+  </style>
+</head>
+<body class="flex justify-center items-center" style="min-height: 100vh; background-color: var(--color-bg); padding: var(--space-4);">
+
+  <div class="card" style="width: 100%; max-width: 600px;">
+    <div class="text-center mb-6">
+      <h2 class="mb-2">Create Account</h2>
+      <p class="text-muted">Join AgriForce to streamline your farming operations.</p>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-tab="farmer" onclick="toggleAuthTab('farmer'); document.getElementById('role').value='FARMER';">Farmer</div>
+      <div class="auth-tab" data-tab="worker" onclick="toggleAuthTab('worker'); document.getElementById('role').value='WORKER';">Worker</div>
+      <div class="auth-tab" data-tab="provider" onclick="toggleAuthTab('provider'); document.getElementById('role').value='EQUIPMENT_PROVIDER';">Equipment Provider</div>
+    </div>
+
+    <form id="register-form" onsubmit="event.preventDefault(); validateRegistrationForm(new FormData(this));">
+      <input type="hidden" id="role" name="role" value="FARMER">
+      
+      <!-- Common Fields -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <div class="flex gap-2">
+            <input type="tel" id="reg-phone" name="phone" class="form-control" required style="flex: 1;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="requestOTP(document.getElementById('reg-phone').value)">Get OTP</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OTP Section -->
+      <div id="otp-section" class="form-group" style="display: none; background: rgba(82, 183, 136, 0.1); padding: var(--space-4); border-radius: var(--radius-md);">
+        <label class="form-label">Enter 6-digit OTP</label>
+        <div class="flex gap-2 items-center">
+          <input type="text" id="reg-otp" class="form-control" maxlength="6" style="letter-spacing: 4px; text-align: center; width: 120px;">
+          <button type="button" class="btn btn-primary btn-sm" onclick="verifyOTP(document.getElementById('reg-phone').value, document.getElementById('reg-otp').value)">Verify</button>
+          <span id="otp-verified-badge" class="badge badge-green" style="display: none;"><i data-lucide="check"></i> Verified</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" name="confirmPassword" class="form-control" required>
+        </div>
+      </div>
+
+      <!-- Farmer Specific -->
+      <div id="pane-farmer" class="auth-pane active">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Farm Size (Acres)</label>
+            <input type="number" name="farmSize" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Primary Crop</label>
+            <select name="primaryCrop" class="form-control">
+              <option value="Wheat">Wheat</option>
+              <option value="Rice">Rice</option>
+              <option value="Cotton">Cotton</option>
+              <option value="Sugarcane">Sugarcane</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">District</label>
+            <input type="text" name="district" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Land Type</label>
+            <select name="landType" class="form-control">
+              <option value="Irrigated">Irrigated</option>
+              <option value="Rainfed">Rainfed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Worker Specific -->
+      <div id="pane-worker" class="auth-pane">
+        <div class="form-group">
+          <label class="form-label">Skills (Ctrl+Click to multi-select)</label>
+          <select id="worker-skills" multiple class="form-control" style="height: 100px;">
+            <option value="Harvesting">Harvesting</option>
+            <option value="Sowing">Sowing</option>
+            <option value="Tractor Driving">Tractor Driving</option>
+            <option value="Pesticide Spraying">Pesticide Spraying</option>
+          </select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Experience (Years)</label>
+            <input type="number" name="experienceYears" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Daily Wage Expectation (₹)</label>
+            <input type="number" name="expectedWage" class="form-control">
+          </div>
+        </div>
+      </div>
+
+      <!-- Provider Specific -->
+      <div id="pane-provider" class="auth-pane">
+        <div class="form-group">
+          <label class="form-label">Business Name</label>
+          <input type="text" name="businessName" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Equipment Types Offered</label>
+          <input type="text" name="equipmentTypes" class="form-control" placeholder="e.g. Tractors, Harvesters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">District</label>
+          <input type="text" name="providerDistrict" class="form-control">
+        </div>
+      </div>
+
+      <button type="submit" id="submit-btn" class="btn btn-primary w-100 mt-6" disabled>Register Account</button>
+      
+      <p class="text-center text-muted mt-4">
+        Already have an account? <a href="login.html" class="font-bold">Login</a>
+      </p>
+    </form>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriForce - Predict. Connect. Harvest on Time.</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/index.css">
+  
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container flex justify-between items-center">
+      <a href="index.html" class="navbar-brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+        AgriForce
+      </a>
+      
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How it Works</a></li>
+        <li>
+          <button class="theme-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+            <i data-lucide="moon" id="theme-icon"></i>
+          </button>
+        </li>
+        <li><a href="login.html" class="btn btn-outline btn-sm">Login</a></li>
+        <li><a href="register.html" class="btn btn-primary btn-sm">Register</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="container flex items-center justify-between">
+        <div class="hero-content">
+          <h1 class="hero-title">Predict. Connect. Harvest on Time.</h1>
+          <p class="hero-subtitle">The AI-powered platform designed to solve agricultural labour shortages for Indian farmers.</p>
+          <button class="btn btn-primary" onclick="handleGetStarted()">Get Started</button>
+        </div>
+        <div class="hero-image" style="flex: 1; display: flex; justify-content: flex-end;">
+          <img src="https://placehold.co/500x400/2d6a4f/ffffff?text=AgriForce+Platform" alt="AgriForce Platform Illustration" loading="lazy" style="border-radius: var(--radius-lg);">
+        </div>
+      </div>
+    </section>
+
+    <section class="container" style="padding: var(--space-8) var(--space-4);">
+      <div class="stats-row">
+        <div class="card stat-card">
+          <div class="stat-value"><span class="counter-value" data-target="43">0%</span></div>
+          <div class="stat-label">Workforce Decline (last 37 years)</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value"><span class="counter-value" data-target="26">0%</span></div>
+          <div class="stat-label">Global Agri-Workforce Drop</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="container" style="padding: var(--space-12) var(--space-4);">
+      <h2 class="text-center mb-12" style="font-size: 2.5rem; margin-bottom: var(--space-8);">Powerful Features</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6);">
+        <!-- ASYMMETRIC GRID -->
+        <div class="card" style="grid-row: span 2;">
+          <i data-lucide="bar-chart-2" style="width: 48px; height: 48px; color: var(--color-primary); margin-bottom: var(--space-4);"></i>
+          <h3>AI Labour Demand Forecasting</h3>
+          <p class="text-muted mt-2">Predict labour requirements up to 90 days in advance using historical data and local crop cycles. Stay prepared for peak harvest seasons.</p>
+        </div>
+        <div class="card">
+          <i data-lucide="users" style="width: 32px; height: 32px; color: var(--color-secondary); margin-bottom: var(--space-4);"></i>
+          <h3>Real-time Worker Matching</h3>
+          <p class="text-muted mt-2">Connect instantly with verified local agricultural workers based on skills, location, and required dates.</p>
+        </div>
+        <div class="card">
+          <i data-lucide="truck" style="width: 32px; height: 32px; color: var(--color-accent); margin-bottom: var(--space-4);"></i>
+          <h3>Equipment Rental</h3>
+          <p class="text-muted mt-2">Book tractors, harvesters, and other heavy machinery from local providers with transparent daily pricing.</p>
+        </div>
+        <div class="card" style="grid-column: span 2;">
+          <i data-lucide="file-text" style="width: 32px; height: 32px; color: var(--color-primary); margin-bottom: var(--space-4);"></i>
+          <h3>Government Subsidy Guidance</h3>
+          <p class="text-muted mt-2">Never miss out on financial support. Get timely alerts for government schemes and check eligibility instantly.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="container" style="padding: var(--space-12) var(--space-4);">
+      <h2 class="text-center" style="margin-bottom: var(--space-8);">How It Works</h2>
+      <div class="flex justify-between text-center gap-6" style="flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px;">
+          <div style="font-size: 3rem; color: var(--color-primary); font-family: var(--font-heading); font-weight: 700;">1</div>
+          <h3 class="mt-2">Predict</h3>
+          <p class="text-muted mt-2">View AI-driven demand forecasts for your crops to plan ahead.</p>
+        </div>
+        <div style="flex: 1; min-width: 250px;">
+          <div style="font-size: 3rem; color: var(--color-secondary); font-family: var(--font-heading); font-weight: 700;">2</div>
+          <h3 class="mt-2">Connect</h3>
+          <p class="text-muted mt-2">Post jobs and get matched with available skilled workers nearby.</p>
+        </div>
+        <div style="flex: 1; min-width: 250px;">
+          <div style="font-size: 3rem; color: var(--color-accent); font-family: var(--font-heading); font-weight: 700;">3</div>
+          <h3 class="mt-2">Harvest</h3>
+          <p class="text-muted mt-2">Complete your farming operations smoothly and on time.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="container text-center" style="padding: var(--space-12) var(--space-4);">
+      <h2>What Farmers Say</h2>
+      <div class="card mt-6" style="max-width: 600px; margin: 0 auto; position: relative;">
+        <div class="testimonial-item active" style="padding: var(--space-4);">
+          <p style="font-size: 1.1rem; font-style: italic;">"AgriForce completely changed how I manage my wheat harvest. I found reliable workers within hours."</p>
+          <h4 class="mt-4">— Ramesh K., Punjab</h4>
+        </div>
+        <div class="testimonial-item" style="padding: var(--space-4); display: none;">
+          <p style="font-size: 1.1rem; font-style: italic;">"The subsidy alerts helped me save ₹15,000 on new equipment. Very helpful platform."</p>
+          <h4 class="mt-4">— Anjali S., Maharashtra</h4>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container flex justify-between items-center" style="flex-wrap: wrap;">
+      <p class="text-muted">&copy; 2026 AgriForce. All rights reserved.</p>
+      <div class="gap-4 flex">
+        <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+        <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+        <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      animateCounters();
+      // Simple carousel logic overriding the external one for demo
+      const items = document.querySelectorAll('.testimonial-item');
+      if (items.length > 1) {
+        let i = 0;
+        setInterval(() => {
+          items[i].style.display = 'none';
+          i = (i + 1) % items.length;
+          items[i].style.display = 'block';
+        }, 4000);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worker Dashboard - AgriForce</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar flex-col justify-between">
+    <div>
+      <div class="px-4 mb-6">
+        <h2 class="text-primary flex items-center gap-2"><i data-lucide="leaf"></i> AgriForce</h2>
+      </div>
+      <nav>
+        <a href="worker-dashboard.html" class="sidebar-link active"><i data-lucide="home"></i> Dashboard</a>
+        <a href="#" class="sidebar-link"><i data-lucide="search"></i> Find Jobs</a>
+        <a href="#" class="sidebar-link"><i data-lucide="briefcase"></i> My Applications</a>
+        <a href="#" class="sidebar-link"><i data-lucide="user"></i> Profile</a>
+      </nav>
+    </div>
+    <div class="px-4 pb-4">
+      <button class="btn btn-outline w-100" onclick="logoutUser()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <!-- Top Navbar -->
+    <header class="flex justify-between items-center mb-6">
+      <h2>Welcome, Suresh</h2>
+      <div class="flex gap-4 items-center">
+        <button class="theme-toggle" onclick="toggleDarkMode()"><i data-lucide="moon" id="theme-icon"></i></button>
+        <div style="position: relative;">
+          <button class="notif-bell"><i data-lucide="bell"></i><span class="notif-badge" style="display: none;">0</span></button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Profile Progress -->
+    <div class="card mb-6 flex items-center justify-between" id="profile-prompt" style="display: none; background: rgba(244, 162, 97, 0.1); border-left: 4px solid var(--color-accent);">
+      <div>
+        <h4 class="mb-1">Complete your profile</h4>
+        <p class="text-muted text-sm">Add your past experience to get 2x more job matches.</p>
+        <div style="width: 200px; height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 8px; overflow: hidden;">
+          <div id="profile-progress-bar" style="height: 100%; width: 0%; background: var(--color-accent); transition: width 0.5s;"></div>
+        </div>
+        <span id="profile-progress-text" class="text-sm font-bold mt-1 inline-block">0%</span>
+      </div>
+      <button class="btn btn-accent btn-sm">Update Now</button>
+    </div>
+
+    <!-- Main Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6);">
+      
+      <!-- Left Column: Jobs & Filter -->
+      <div>
+        <div class="card mb-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3>Available Jobs</h3>
+          </div>
+          
+          <form id="job-filters" class="mb-4" onsubmit="event.preventDefault(); fetchAvailableJobs(Object.fromEntries(new FormData(this)));">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: var(--space-2); align-items: end;">
+              <div>
+                <label class="text-sm text-muted">Crop</label>
+                <select name="cropType" class="form-control btn-sm" style="height: 36px;">
+                  <option value="">Any Crop</option>
+                  <option value="Wheat">Wheat</option>
+                  <option value="Rice">Rice</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-sm text-muted">District</label>
+                <input type="text" name="district" class="form-control btn-sm" placeholder="Any" style="height: 36px;">
+              </div>
+              <div>
+                <label class="text-sm text-muted">Min Wage</label>
+                <input type="number" name="minWage" class="form-control btn-sm" placeholder="₹" style="height: 36px;">
+              </div>
+              <button type="submit" class="btn btn-outline btn-sm">Filter</button>
+            </div>
+          </form>
+
+          <div id="jobs-list">
+            <div id="available-jobs-panel">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: My Apps & Earnings -->
+      <div>
+        <div class="card mb-6">
+          <h3>My Applications</h3>
+          <div class="table-responsive mt-4">
+            <table class="table" id="my-apps-table">
+              <thead>
+                <tr>
+                  <th>Job</th>
+                  <th>Farmer</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex justify-between items-center mb-4">
+            <h3>Earnings Summary</h3>
+            <select class="form-control btn-sm" style="width: 100px; height: 32px;" onchange="renderEarningsChart(CURRENT_WORKER_ID, this.value)">
+              <option value="3m">3 Months</option>
+              <option value="6m">6 Months</option>
+              <option value="1y">1 Year</option>
+            </select>
+          </div>
+          <div style="height: 200px; position: relative;">
+            <canvas id="earningsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/socket.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    const CURRENT_WORKER_ID = "W456";
+    
+    document.addEventListener("DOMContentLoaded", () => {
+      setAuthToken("demo-token");
+      
+      initJobAlertSocket(CURRENT_WORKER_ID);
+      calculateProfileCompletion(CURRENT_WORKER_ID);
+      
+      fetchAvailableJobs(); // Fetch initial jobs
+      loadMyApplications(CURRENT_WORKER_ID);
+      renderEarningsChart(CURRENT_WORKER_ID, '3m');
+    });
+  </script>
+</body>
+</html>

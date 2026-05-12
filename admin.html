@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - AgriForce</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .admin-tab-content { display: none; }
+    .admin-tab-content.active { display: block; }
+  </style>
+</head>
+<body class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar flex-col justify-between">
+    <div>
+      <div class="px-4 mb-6">
+        <h2 class="text-primary flex items-center gap-2"><i data-lucide="shield"></i> AgriAdmin</h2>
+      </div>
+      <nav>
+        <a href="#" class="sidebar-link active" onclick="switchAdminTab('dashboard', this)"><i data-lucide="pie-chart"></i> Dashboard</a>
+        <a href="#" class="sidebar-link" onclick="switchAdminTab('users', this)"><i data-lucide="users"></i> Users</a>
+        <a href="#" class="sidebar-link" onclick="switchAdminTab('reports', this)"><i data-lucide="file-bar-chart"></i> Reports</a>
+      </nav>
+    </div>
+    <div class="px-4 pb-4">
+      <button class="btn btn-outline w-100" onclick="logoutUser()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="flex justify-between items-center mb-6">
+      <h2>Admin Panel</h2>
+      <button class="theme-toggle" onclick="toggleDarkMode()"><i data-lucide="moon" id="theme-icon"></i></button>
+    </header>
+
+    <!-- Dashboard Tab -->
+    <div id="tab-dashboard" class="admin-tab-content active">
+      <div class="stats-row">
+        <div class="card stat-card">
+          <div class="stat-value">1,245</div>
+          <div class="stat-label">Total Farmers</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value">3,890</div>
+          <div class="stat-label">Total Workers</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value text-accent">850</div>
+          <div class="stat-label">Jobs Posted</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value text-primary">620</div>
+          <div class="stat-label">Hires Made</div>
+        </div>
+      </div>
+      <div class="card mt-6">
+        <h3 class="mb-4">Platform Growth</h3>
+        <div style="height: 300px;">
+          <canvas id="growthChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="tab-users" class="admin-tab-content">
+      <div class="card">
+        <div class="flex justify-between items-center mb-4">
+          <h3>User Management</h3>
+          <div class="flex gap-2">
+            <button class="btn btn-outline btn-sm">Farmers</button>
+            <button class="btn btn-outline btn-sm">Workers</button>
+            <button class="btn btn-outline btn-sm">Providers</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Phone</th>
+                <th>Joined</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ramesh K.</td>
+                <td>Farmer</td>
+                <td>+91 9876543210</td>
+                <td>10 Oct 2026</td>
+                <td><span class="badge badge-green">ACTIVE</span></td>
+                <td>
+                  <button class="btn btn-outline btn-sm" onclick="deactivateUser('U1')">Deactivate</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Suresh M.</td>
+                <td>Worker</td>
+                <td>+91 8765432109</td>
+                <td>12 Oct 2026</td>
+                <td><span class="badge badge-amber">PENDING</span></td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="approveUser('U2')">Approve</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Tab -->
+    <div id="tab-reports" class="admin-tab-content">
+      <div class="card" style="max-width: 600px;">
+        <h3 class="mb-4">Export Data</h3>
+        <form onsubmit="event.preventDefault(); exportReport(this.reportType.value, this.dateRange.value);">
+          <div class="form-group">
+            <label class="form-label">Report Type</label>
+            <select name="reportType" class="form-control">
+              <option value="users">Users</option>
+              <option value="jobs">Jobs</option>
+              <option value="hires">Hires</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date Range</label>
+            <select name="dateRange" class="form-control">
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-4"><i data-lucide="download" class="mr-2"></i> Export CSV</button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    function switchAdminTab(tabId, el) {
+      document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+      el.classList.add('active');
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const ctx = document.getElementById('growthChart');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [{
+              label: 'New Users',
+              data: [150, 300, 450, 800, 1200],
+              borderColor: '#2d6a4f',
+              tension: 0.4
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

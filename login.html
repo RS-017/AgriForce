@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - AgriForce</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .auth-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    .auth-left {
+      flex: 1;
+      background-color: var(--color-primary);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-8);
+    }
+    .auth-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-8);
+      background-color: var(--color-bg);
+    }
+    .auth-card {
+      max-width: 400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    @media (max-width: 768px) {
+      .auth-left { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-layout">
+    <div class="auth-left">
+      <div style="max-width: 400px; margin: 0 auto;">
+        <h1 style="color: white; font-size: 3rem; margin-bottom: var(--space-4);">AgriForce</h1>
+        <p style="font-size: 1.25rem; opacity: 0.9;">Predict. Connect. Harvest on Time.</p>
+        <img src="https://placehold.co/400x300/2d6a4f/ffffff?text=AgriForce+Illustration" alt="Farmer illustration" loading="lazy" class="mt-8" style="border-radius: var(--radius-md);">
+      </div>
+    </div>
+    
+    <div class="auth-right">
+      <div class="auth-card card">
+        <h2 class="text-center mb-6">Welcome Back</h2>
+        <form id="login-form" onsubmit="event.preventDefault(); validateLoginForm(new FormData(this));">
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone Number or Email</label>
+            <input type="text" id="phone" name="phone" class="form-control" required placeholder="Enter phone or email">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required placeholder="Enter password">
+          </div>
+          
+          <div class="flex justify-between items-center mb-4 text-sm">
+            <label class="flex items-center gap-2">
+              <input type="checkbox"> Remember me
+            </label>
+            <a href="#" class="text-primary font-medium">Forgot Password?</a>
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-100 mb-4">Login</button>
+          
+          <p class="text-center text-muted">
+            Don't have an account? <a href="register.html" class="font-bold">Register</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

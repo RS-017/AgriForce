@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Dashboard - AgriForce</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar flex-col justify-between">
+    <div>
+      <div class="px-4 mb-6">
+        <h2 class="text-primary flex items-center gap-2"><i data-lucide="leaf"></i> AgriForce</h2>
+      </div>
+      <nav>
+        <a href="farmer-dashboard.html" class="sidebar-link active"><i data-lucide="home"></i> Dashboard</a>
+        <a href="post-job.html" class="sidebar-link"><i data-lucide="plus-circle"></i> Post Job</a>
+        <a href="equipment-rental.html" class="sidebar-link"><i data-lucide="truck"></i> Equipment</a>
+        <a href="subsidies.html" class="sidebar-link"><i data-lucide="file-text"></i> Subsidies</a>
+      </nav>
+    </div>
+    <div class="px-4 pb-4">
+      <button class="btn btn-outline w-100" onclick="logoutUser()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <!-- Top Navbar -->
+    <header class="flex justify-between items-center mb-6">
+      <h2>Welcome, Ramesh</h2>
+      <div class="flex gap-4 items-center">
+        <button class="theme-toggle" onclick="toggleDarkMode()"><i data-lucide="moon" id="theme-icon"></i></button>
+        <div style="position: relative;">
+          <button class="notif-bell"><i data-lucide="bell"></i><span class="notif-badge">3</span></button>
+          <!-- Hidden panel for demo -->
+          <div id="notif-panel" style="display: none; position: absolute; right: 0; width: 300px; background: var(--color-surface); box-shadow: var(--shadow-lg); border-radius: var(--radius-md); padding: var(--space-2); z-index: 100;"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- KPI Row -->
+    <div class="stats-row">
+      <div class="card stat-card">
+        <div class="stat-value">4</div>
+        <div class="stat-label">Active Job Posts</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value">12</div>
+        <div class="stat-label">Workers Hired</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value">8</div>
+        <div class="stat-label">Pending Applications</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value text-accent">2</div>
+        <div class="stat-label">Subsidies Available</div>
+      </div>
+    </div>
+
+    <!-- AI Forecast Panel -->
+    <div class="card mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3>Labour Demand Forecast (90 Days)</h3>
+        <span class="badge badge-amber"><i data-lucide="alert-triangle" style="width:12px; display:inline-block; vertical-align:text-bottom;"></i> High demand in W3 Oct</span>
+      </div>
+      <div id="forecast-panel" style="height: 300px; position: relative;">
+        <canvas id="forecastChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Sub-panels Row -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6);">
+      
+      <!-- Job Posts Table -->
+      <div class="card">
+        <div class="flex justify-between items-center mb-4">
+          <h3>My Job Posts</h3>
+          <a href="post-job.html" class="btn btn-primary btn-sm">Post New Job</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Crop</th>
+                <th>District</th>
+                <th>Workers</th>
+                <th>Dates</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Wheat</td>
+                <td>Ludhiana</td>
+                <td>10</td>
+                <td>Oct 15 - Oct 25</td>
+                <td><span class="badge badge-green">OPEN</span></td>
+                <td>
+                  <button class="btn btn-outline btn-sm" onclick="editJobPost('J1')"><i data-lucide="edit-2"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>Rice</td>
+                <td>Amritsar</td>
+                <td>5</td>
+                <td>Sep 10 - Sep 15</td>
+                <td><span class="badge badge-blue">FILLED</span></td>
+                <td>
+                  <button class="btn btn-outline btn-sm" onclick="closeJobPost('J2')"><i data-lucide="archive"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recommended Workers -->
+      <div class="card">
+        <h3>Recommended Workers</h3>
+        <p class="text-muted text-sm mb-4">Based on your active posts</p>
+        <div id="recommended-workers-panel">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Floating Action Button -->
+    <a href="post-job.html" style="position: fixed; bottom: 32px; right: 32px; background: var(--color-primary); color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow-lg); transition: transform 0.2s;">
+      <i data-lucide="plus" style="width: 24px; height: 24px;"></i>
+    </a>
+  </main>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/socket.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const MOCK_USER_ID = "F123";
+      setAuthToken("demo-token"); // bypass auth for UI demo
+      
+      initNotificationSocket(MOCK_USER_ID);
+      
+      // Load UI components
+      showSkeletonLoader('forecast-panel');
+      setTimeout(() => {
+        hideSkeletonLoader('forecast-panel');
+        renderDemandForecastChart();
+      }, 800);
+      
+      loadRecommendedWorkers(MOCK_USER_ID);
+      // Create alert banner container above grid dynamically
+      const alertPanel = document.createElement('div');
+      alertPanel.id = 'subsidy-alerts-panel';
+      document.querySelector('.main-content').insertBefore(alertPanel, document.querySelector('.stats-row'));
+      loadSubsidyAlerts('Punjab', 'Wheat');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post a Job - AgriForce</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .progress-bar-container {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-bottom: var(--space-8);
+    }
+    .progress-bar-container::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #e0e0e0;
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+    .step-indicator {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      z-index: 2;
+      position: relative;
+      transition: all 0.3s;
+    }
+    .step-indicator.active {
+      background: var(--color-primary);
+      color: white;
+      box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.2);
+    }
+    .step-content {
+      display: none;
+    }
+    .step-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar flex-col justify-between">
+    <div>
+      <div class="px-4 mb-6">
+        <h2 class="text-primary flex items-center gap-2"><i data-lucide="leaf"></i> AgriForce</h2>
+      </div>
+      <nav>
+        <a href="farmer-dashboard.html" class="sidebar-link"><i data-lucide="home"></i> Dashboard</a>
+        <a href="post-job.html" class="sidebar-link active"><i data-lucide="plus-circle"></i> Post Job</a>
+        <a href="equipment-rental.html" class="sidebar-link"><i data-lucide="truck"></i> Equipment</a>
+        <a href="subsidies.html" class="sidebar-link"><i data-lucide="file-text"></i> Subsidies</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="container" style="max-width: 800px; padding-top: var(--space-6);">
+      
+      <div id="form-container">
+        <h2 class="mb-6">Post a New Job</h2>
+        
+        <div class="progress-bar-container">
+          <div class="step-indicator active" id="ind-1">1</div>
+          <div class="step-indicator" id="ind-2">2</div>
+          <div class="step-indicator" id="ind-3">3</div>
+        </div>
+
+        <div class="card">
+          <form id="post-job-form" onsubmit="event.preventDefault(); submitJobPost(new FormData(this));">
+            
+            <!-- Step 1 -->
+            <div id="step-1" class="step-content active">
+              <h3 class="mb-4">Farm Details</h3>
+              <div class="form-group">
+                <label class="form-label">State</label>
+                <select name="state" class="form-control" onchange="fetchLocationData(this.value, 'Amritsar')">
+                  <option value="Punjab">Punjab</option>
+                  <option value="Haryana">Haryana</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">District</label>
+                <select name="district" class="form-control" onchange="fetchLocationData('Punjab', this.value)">
+                  <option value="Amritsar">Amritsar</option>
+                  <option value="Ludhiana">Ludhiana</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Taluk</label>
+                <select name="taluk" id="taluk-select" class="form-control">
+                  <option value="">Select Taluk</option>
+                </select>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                <div class="form-group">
+                  <label class="form-label">Farm Size (Acres)</label>
+                  <input type="number" name="farmSize" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Land Type</label>
+                  <select name="landType" class="form-control">
+                    <option value="Irrigated">Irrigated</option>
+                    <option value="Rainfed">Rainfed</option>
+                  </select>
+                </div>
+              </div>
+              <div class="flex justify-end mt-6">
+                <button type="button" class="btn btn-primary" onclick="validateStep(1)">Next Step <i data-lucide="arrow-right" class="ml-2"></i></button>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div id="step-2" class="step-content">
+              <h3 class="mb-4">Labour Requirements</h3>
+              <div class="form-group">
+                <label class="form-label">Crop Type</label>
+                <select name="cropType" class="form-control" onchange="autofillPeakSeason(this.value)">
+                  <option value="">Select Crop</option>
+                  <option value="Wheat">Wheat</option>
+                  <option value="Rice">Rice</option>
+                </select>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                <div class="form-group">
+                  <label class="form-label">Number of Workers Required</label>
+                  <input type="number" name="workersNeeded" id="workers-needed" class="form-control" required min="1" oninput="calculateCost()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Daily Wage (₹)</label>
+                  <input type="number" name="dailyWage" id="daily-wage" class="form-control" required min="100" oninput="calculateCost()">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Required Skills (Ctrl+Click to multi-select)</label>
+                <select id="req-skills" multiple class="form-control" style="height: 100px;">
+                  <option value="Harvesting">Harvesting</option>
+                  <option value="Sowing">Sowing</option>
+                  <option value="Tractor Driving">Tractor Driving</option>
+                </select>
+              </div>
+              <div class="flex justify-between mt-6">
+                <button type="button" class="btn btn-outline" onclick="goToStep(1)"><i data-lucide="arrow-left" class="mr-2"></i> Back</button>
+                <button type="button" class="btn btn-primary" onclick="validateStep(2)">Next Step <i data-lucide="arrow-right" class="ml-2"></i></button>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div id="step-3" class="step-content">
+              <h3 class="mb-4">Schedule & Budget</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                <div class="form-group">
+                  <label class="form-label">Start Date</label>
+                  <input type="date" name="startDate" id="job-start-date" class="form-control" required onchange="calculateCost()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">End Date</label>
+                  <input type="date" name="endDate" id="job-end-date" class="form-control" required onchange="calculateCost()">
+                </div>
+              </div>
+              
+              <div class="card mb-4" style="background: rgba(45, 106, 79, 0.05); border: 1px dashed var(--color-primary);">
+                <div class="flex justify-between items-center">
+                  <span class="font-bold">Estimated Total Cost:</span>
+                  <span class="font-bold text-primary" style="font-size: 1.5rem;" id="total-cost-display">₹0</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Additional Notes</label>
+                <textarea name="notes" class="form-control" rows="3" placeholder="Any specific instructions for workers..."></textarea>
+              </div>
+              
+              <div class="flex justify-between mt-6">
+                <button type="button" class="btn btn-outline" onclick="goToStep(2)"><i data-lucide="arrow-left" class="mr-2"></i> Back</button>
+                <button type="submit" class="btn btn-primary">Submit Job Post</button>
+              </div>
+            </div>
+
+          </form>
+
+          <div id="success-state" style="display: none; text-align: center; padding: var(--space-8) 0;">
+            <i data-lucide="check-circle" style="width: 64px; height: 64px; color: var(--color-success); margin-bottom: var(--space-4);"></i>
+            <h2 class="mb-2">Job Posted Successfully!</h2>
+            <p class="text-muted mb-6">Your job has been published and nearby workers are being notified.</p>
+            <a href="farmer-dashboard.html" class="btn btn-primary">View My Posts</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    function calculateCost() {
+      const workers = document.getElementById('workers-needed').value || 0;
+      const wage = document.getElementById('daily-wage').value || 0;
+      const start = new Date(document.getElementById('job-start-date').value);
+      const end = new Date(document.getElementById('job-end-date').value);
+      
+      let days = 0;
+      if (start && end && !isNaN(start) && !isNaN(end)) {
+        const diffTime = Math.abs(end - start);
+        days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
+      }
+      
+      const total = workers * wage * (days > 0 ? days : 1);
+      document.getElementById('total-cost-display').innerText = `₹${total.toLocaleString('en-IN')}`;
+    }
+  </script>
+</body>
+</html>

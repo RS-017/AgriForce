@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipment Rental - AgriForce</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar flex-col justify-between">
+    <div>
+      <div class="px-4 mb-6">
+        <h2 class="text-primary flex items-center gap-2"><i data-lucide="leaf"></i> AgriForce</h2>
+      </div>
+      <nav>
+        <a href="farmer-dashboard.html" class="sidebar-link"><i data-lucide="home"></i> Dashboard</a>
+        <a href="post-job.html" class="sidebar-link"><i data-lucide="plus-circle"></i> Post Job</a>
+        <a href="equipment-rental.html" class="sidebar-link active"><i data-lucide="truck"></i> Equipment</a>
+        <a href="subsidies.html" class="sidebar-link"><i data-lucide="file-text"></i> Subsidies</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="flex justify-between items-center mb-6">
+      <h2>Equipment Rental</h2>
+      <button class="theme-toggle" onclick="toggleDarkMode()"><i data-lucide="moon" id="theme-icon"></i></button>
+    </header>
+
+    <div style="display: grid; grid-template-columns: 250px 1fr; gap: var(--space-6);">
+      
+      <!-- Filters Sidebar -->
+      <div class="card h-100">
+        <h3 class="mb-4">Filters</h3>
+        <form id="eq-filters" onsubmit="event.preventDefault(); applyEquipmentFilters(Object.fromEntries(new FormData(this)));">
+          <div class="form-group">
+            <label class="form-label">Equipment Type</label>
+            <select name="type" class="form-control">
+              <option value="">All Types</option>
+              <option value="Tractor">Tractor</option>
+              <option value="Harvester">Harvester</option>
+              <option value="Seeder">Seeder</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">District</label>
+            <input type="text" name="district" class="form-control" placeholder="E.g., Ludhiana">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Max Price (₹/day)</label>
+            <input type="range" name="maxPrice" min="500" max="10000" step="500" class="w-100" oninput="document.getElementById('price-val').innerText = '₹' + this.value">
+            <div class="text-right text-sm text-muted mt-1" id="price-val">₹5000</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Availability</label>
+            <select name="availability" class="form-control">
+              <option value="available">Available Now</option>
+              <option value="all">Show All</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-4">Apply Filters</button>
+        </form>
+      </div>
+
+      <!-- Equipment Grid -->
+      <div>
+        <div id="equipment-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4);">
+          <!-- Populated by JS. Example item: -->
+          <div class="card flex-col justify-between">
+            <img src="https://placehold.co/300x200/52b788/ffffff?text=Tractor" alt="Tractor" loading="lazy" style="height: 150px; object-fit: cover; border-radius: 4px;" class="mb-4">
+            <div>
+              <h3>Mahindra Tractor</h3>
+              <span class="badge badge-gray">Tractor</span>
+              <p class="mt-2 text-muted"><i data-lucide="map-pin"></i> Ludhiana</p>
+              <p class="font-bold text-primary mt-2">₹2000/day</p>
+            </div>
+            <div class="mt-4 flex justify-between items-center">
+              <span class="badge badge-green">AVAILABLE</span>
+              <button class="btn btn-outline btn-sm" onclick="openEquipmentModal('EQ1')">View Details</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipment Modal -->
+    <div id="equipment-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+      <div class="card" style="width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+        <div class="flex justify-between items-center mb-4">
+          <h2 id="modal-eq-name">Equipment Details</h2>
+          <button onclick="closeEquipmentModal()" style="background:none; border:none; cursor:pointer;"><i data-lucide="x"></i></button>
+        </div>
+        <p id="modal-eq-desc" class="mb-4 text-muted">Description goes here.</p>
+        <p id="modal-eq-price" class="font-bold text-primary text-xl mb-6">₹0/day</p>
+        
+        <form onsubmit="event.preventDefault(); submitRentalBooking(Object.fromEntries(new FormData(this)));">
+          <input type="hidden" name="equipmentId" id="modal-eq-id">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+            <div class="form-group">
+              <label class="form-label">Start Date</label>
+              <input type="date" name="startDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Date</label>
+              <input type="date" name="endDate" class="form-control" required>
+            </div>
+          </div>
+          <div class="flex gap-4 mt-4">
+            <button type="button" class="btn btn-outline flex-1" onclick="contactEquipmentProvider('P1')">Contact Provider</button>
+            <button type="submit" class="btn btn-primary flex-1">Book Now</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
