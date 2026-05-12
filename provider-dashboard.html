@@ -360,7 +360,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      setAuthToken('demo-token');
+      if (!requireAuth()) return;
 
       const welcomeEl = document.getElementById('welcome-heading');
       if (welcomeEl && welcomeEl.textContent === 'Welcome, Provider') {

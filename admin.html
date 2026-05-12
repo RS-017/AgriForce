@@ -155,6 +155,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      if (!requireAuth()) return;
       const ctx = document.getElementById('growthChart');
       if (ctx) {
         new Chart(ctx, {

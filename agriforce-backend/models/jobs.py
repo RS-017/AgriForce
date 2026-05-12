@@ -36,7 +36,7 @@ class JobPost(Base):
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
     daily_wage_offered = Column(Float, nullable=False)
-    status = Column(Enum(JobStatus), default=JobStatus.OPEN, nullable=False)
+    status = Column(Enum(JobStatus, name="job_status"), default=JobStatus.OPEN, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     farmer = relationship("FarmerProfile", back_populates="job_posts")
@@ -51,7 +51,7 @@ class Application(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     job_id = Column(UUID(as_uuid=True), ForeignKey("job_posts.id", ondelete="CASCADE"), nullable=False)
     worker_id = Column(UUID(as_uuid=True), ForeignKey("worker_profiles.id", ondelete="CASCADE"), nullable=False)
-    status = Column(Enum(ApplicationStatus), default=ApplicationStatus.PENDING, nullable=False)
+    status = Column(Enum(ApplicationStatus, name="application_status"), default=ApplicationStatus.PENDING, nullable=False)
     applied_at = Column(DateTime(timezone=True), server_default=func.now())
 
     job = relationship("JobPost", back_populates="applications")

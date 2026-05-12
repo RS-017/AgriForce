@@ -67,6 +67,9 @@
         <a href="subsidies.html" class="sidebar-link"><i data-lucide="file-text"></i> Subsidies</a>
       </nav>
     </div>
+    <div class="px-4 pb-4">
+      <button class="btn btn-outline w-100" onclick="logoutUser()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
   </aside>
 
   <main class="main-content">
@@ -209,18 +212,24 @@
   <script src="assets/js/config.js"></script>
   <script src="assets/js/app.js"></script>
   <script>
+    // Guard: redirect to login if no valid token
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!requireAuth()) return;
+      if (typeof lucide !== "undefined") lucide.createIcons();
+    });
+
     function calculateCost() {
       const workers = document.getElementById('workers-needed').value || 0;
       const wage = document.getElementById('daily-wage').value || 0;
       const start = new Date(document.getElementById('job-start-date').value);
       const end = new Date(document.getElementById('job-end-date').value);
-      
+
       let days = 0;
       if (start && end && !isNaN(start) && !isNaN(end)) {
         const diffTime = Math.abs(end - start);
-        days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
+        days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
       }
-      
+
       const total = workers * wage * (days > 0 ? days : 1);
       document.getElementById('total-cost-display').innerText = `₹${total.toLocaleString('en-IN')}`;
     }

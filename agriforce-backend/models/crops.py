@@ -23,7 +23,7 @@ class Crop(Base):
     peak_sowing_end = Column(Date)
     peak_harvest_start = Column(Date)
     peak_harvest_end = Column(Date)
-    season = Column(Enum(Season))
+    season = Column(Enum(Season, name="season"))
 
     subsidy_schemes = relationship(
         "SubsidyScheme", secondary="subsidy_crop_links", back_populates="crops"

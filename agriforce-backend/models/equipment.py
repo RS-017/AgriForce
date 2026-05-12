@@ -33,7 +33,7 @@ class Equipment(Base):
     description = Column(Text)
     daily_rate = Column(Float, nullable=False)
     district = Column(String(100), nullable=False)
-    availability_status = Column(Enum(EquipmentStatus), default=EquipmentStatus.AVAILABLE)
+    availability_status = Column(Enum(EquipmentStatus, name="equipment_status"), default=EquipmentStatus.AVAILABLE)
     images = Column(ARRAY(Text), default=[])
 
     provider = relationship("User")
@@ -49,7 +49,7 @@ class RentalBooking(Base):
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
     total_cost = Column(Float, nullable=False)
-    status = Column(Enum(BookingStatus), default=BookingStatus.PENDING)
+    status = Column(Enum(BookingStatus, name="booking_status"), default=BookingStatus.PENDING)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     equipment = relationship("Equipment", back_populates="bookings")

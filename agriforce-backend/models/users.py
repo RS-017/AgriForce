@@ -39,7 +39,7 @@ class User(Base):
     phone = Column(String(15), unique=True, nullable=False, index=True)
     email = Column(String(255), unique=True, index=True)
     hashed_password = Column(Text, nullable=False)
-    role = Column(Enum(UserRole), nullable=False)
+    role = Column(Enum(UserRole, name="user_role"), nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -62,7 +62,7 @@ class FarmerProfile(Base):
     primary_crop = Column(String(100))
     district = Column(String(100))
     taluk = Column(String(100))
-    land_type = Column(Enum(LandType))
+    land_type = Column(Enum(LandType, name="land_type"))
 
     user = relationship("User", back_populates="farmer_profile")
     job_posts = relationship("JobPost", back_populates="farmer", cascade="all, delete-orphan")
@@ -77,7 +77,7 @@ class WorkerProfile(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
     experience_years = Column(Integer, default=0)
     daily_wage = Column(Float, default=0.0)
-    availability_status = Column(Enum(AvailabilityStatus), default=AvailabilityStatus.AVAILABLE)
+    availability_status = Column(Enum(AvailabilityStatus, name="availability_status"), default=AvailabilityStatus.AVAILABLE)
     is_migrant = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="worker_profile", foreign_keys=[user_id])

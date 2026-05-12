@@ -23,6 +23,9 @@
         <a href="subsidies.html" class="sidebar-link"><i data-lucide="file-text"></i> Subsidies</a>
       </nav>
     </div>
+    <div class="px-4 pb-4">
+      <button class="btn btn-outline w-100" onclick="logoutUser()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
   </aside>
 
   <main class="main-content">
@@ -121,5 +124,12 @@
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!requireAuth()) return;
+      if (typeof lucide !== "undefined") lucide.createIcons();
+      applyEquipmentFilters({ availability: 'available' });
+    });
+  </script>
 </body>
 </html>

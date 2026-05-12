@@ -454,30 +454,48 @@ async function fetchLocationData(state, district) {
 }
 
 async function submitJobPost(formData) {
+  const submitBtn = document.querySelector('#post-job-form button[type="submit"]');
   try {
-    const data = Object.fromEntries(formData.entries());
-    
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting…'; }
+
+    const raw = Object.fromEntries(formData.entries());
+
+    // Map frontend form field names → backend schema field names
+    const payload = {
+      district:            raw.district    || '',
+      taluk:               raw.taluk       || null,
+      workers_required:    parseInt(raw.workersNeeded) || 1,
+      start_date:          raw.startDate,
+      end_date:            raw.endDate,
+      daily_wage_offered:  parseFloat(raw.dailyWage) || 0,
+      notes:               raw.notes || null,
+      // crop_type_id is a UUID in the DB — send a placeholder UUID until
+      // crop types are seeded and the UI has a proper selector
+      crop_type_id:        '00000000-0000-0000-0000-000000000001',
+      skill_ids:           [],
+    };
+
     // Skills multi-select
     const skillsSelect = document.getElementById('req-skills');
     if (skillsSelect) {
-      data.skills = Array.from(skillsSelect.selectedOptions).map(opt => opt.value);
+      // skill_ids are UUIDs in the DB; map names for now (backend will handle gracefully)
+      payload._skill_names = Array.from(skillsSelect.selectedOptions).map(opt => opt.value);
     }
-    
+
     await apiFetch('/jobs/create', {
       method: 'POST',
-      body: JSON.stringify(data)
+      body: JSON.stringify(payload)
     });
-    
+
     document.getElementById('post-job-form').style.display = 'none';
     document.getElementById('success-state').style.display = 'block';
-    // Minimal confetti effect
-    import('https://cdn.skypack.dev/canvas-confetti').then(module => {
-      module.default();
-    });
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   } catch (error) {
-    showToast(error.message, "error");
+    showToast(error.message, 'error');
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit Job Post'; }
   }
 }
+
 
 // Job Management (Farmer)
 async function editJobPost(jobId) {
