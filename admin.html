@@ -1,18 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="e">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - AgriForce</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="assets/css/index.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .admin-tab-content { display: none; }
-    .admin-tab-content.active { display: block; }
+    .admin-tab-content {
+      display: none;
+    }
+
+    .admin-tab-content.active {
+      display: block;
+    }
   </style>
 </head>
+
 <body class="dashboard-layout">
 
   <!-- Sidebar -->
@@ -22,9 +31,11 @@
         <h2 class="text-primary flex items-center gap-2"><i data-lucide="shield"></i> AgriAdmin</h2>
       </div>
       <nav>
-        <a href="#" class="sidebar-link active" onclick="switchAdminTab('dashboard', this)"><i data-lucide="pie-chart"></i> Dashboard</a>
+        <a href="#" class="sidebar-link active" onclick="switchAdminTab('dashboard', this)"><i
+            data-lucide="pie-chart"></i> Dashboard</a>
         <a href="#" class="sidebar-link" onclick="switchAdminTab('users', this)"><i data-lucide="users"></i> Users</a>
-        <a href="#" class="sidebar-link" onclick="switchAdminTab('reports', this)"><i data-lucide="file-bar-chart"></i> Reports</a>
+        <a href="#" class="sidebar-link" onclick="switchAdminTab('reports', this)"><i data-lucide="file-bar-chart"></i>
+          Reports</a>
       </nav>
     </div>
     <div class="px-4 pb-4">
@@ -137,7 +148,8 @@
               <option value="all">All Time</option>
             </select>
           </div>
-          <button type="submit" class="btn btn-primary w-100 mt-4"><i data-lucide="download" class="mr-2"></i> Export CSV</button>
+          <button type="submit" class="btn btn-primary w-100 mt-4"><i data-lucide="download" class="mr-2"></i> Export
+            CSV</button>
         </form>
       </div>
     </div>
@@ -175,4 +187,5 @@
     });
   </script>
 </body>
+
 </html>
